@@ -89,6 +89,9 @@ class CenteredCollectionViewLayout: UICollectionViewLayout {
         
         contentWidth = count * finalCellWidth + (count - 1) * finalCellSpacing
         
+        if Int(count) % 2 == 0 {
+            
+        }
         
         
         

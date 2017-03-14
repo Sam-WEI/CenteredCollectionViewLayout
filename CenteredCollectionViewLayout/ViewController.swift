@@ -12,7 +12,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
 
     @IBOutlet weak var collectionView: UICollectionView!
     
-    var number: Int = 0
+    var number: Int = 5
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,7 +22,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         layout.delegate = self
         collectionView.collectionViewLayout = layout
         
-//        collectionView.contentInset = UIEdgeInsets(top: 5, left: 10, bottom: 2, right: 15)
+        collectionView.contentInset = UIEdgeInsets(top: 10, left: 10, bottom: 20, right: 20)
         
         
     }

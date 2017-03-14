@@ -87,17 +87,15 @@ class CenteredCollectionViewLayout: UICollectionViewLayout {
         var left: CGFloat
         
         if contentWidth > viewPortWidth {
-            left = cv.contentInset.left
+            left = 0
         } else {
-            let midX = cv.contentInset.left + viewPortWidth / 2
+            let midX = viewPortWidth / 2
             left = midX - contentWidth / 2
         }
         
-        let top = cv.contentInset.top
-        
         for i in 0..<Int(count) {
             let attr = UICollectionViewLayoutAttributes(forCellWith: IndexPath(item: i, section: 0))
-            let frame = CGRect(x: left, y: top, width: finalCellWidth, height: contentHeight)
+            let frame = CGRect(x: left, y: 0, width: finalCellWidth, height: contentHeight)
             attr.frame = frame
             cache.append(attr)
             left += finalCellWidth + cellSpacing

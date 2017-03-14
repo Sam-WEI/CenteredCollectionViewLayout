@@ -58,11 +58,11 @@
 			children = (
 				CB1436811E76F285005602F1 /* AppDelegate.swift */,
 				CB1436831E76F285005602F1 /* ViewController.swift */,
+				CB1436931E76FD7A005602F1 /* CenteredCollectionViewLayout.swift */,
 				CB1436851E76F285005602F1 /* Main.storyboard */,
 				CB1436881E76F285005602F1 /* Assets.xcassets */,
 				CB14368A1E76F285005602F1 /* LaunchScreen.storyboard */,
 				CB14368D1E76F285005602F1 /* Info.plist */,
-				CB1436931E76FD7A005602F1 /* CenteredCollectionViewLayout.swift */,
 			);
 			path = CenteredCollectionViewLayout;
 			sourceTree = "<group>";
@@ -304,6 +304,7 @@
 				CB1436921E76F285005602F1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

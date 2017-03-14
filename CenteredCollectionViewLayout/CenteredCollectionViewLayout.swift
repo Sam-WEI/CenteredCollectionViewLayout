@@ -8,9 +8,10 @@
 
 import UIKit
 
-protocol CenteredCollectionViewLayoutDelegate {
-    func cellWidthRange() -> Range<CGFloat>
-    func cellSpacingRange() -> Range<CGFloat>
+@objc protocol CenteredCollectionViewLayoutDelegate {
+    @objc optional func minimumCellWidth() -> CGFloat
+    @objc optional func maximumCellWidth() -> CGFloat
+    @objc optional func cellSpacing() -> CGFloat
 }
 
 
@@ -23,31 +24,36 @@ class CenteredCollectionViewLayout: UICollectionViewLayout {
     private var cv: UICollectionView {
         return collectionView!
     }
+    
+    private var viewPortWidth: CGFloat {
+        return cv.bounds.width - cv.contentInset.left - cv.contentInset.right
+    }
+    
+    private var viewPortHeight: CGFloat {
+        return cv.bounds.height - cv.contentInset.top - cv.contentInset.bottom
+    }
 
-    private var contentHight: CGFloat {
-        return cv.frame.height - cv.contentInset.top - cv.contentInset.bottom
+    private var contentHeight: CGFloat {
+        return self.viewPortHeight
     }
     
     private var contentWidth: CGFloat = 0
     
-    private var minCellSpacing: CGFloat {
-        return delegate?.cellSpacingRange().lowerBound ?? 2
+    private var cellSpacing: CGFloat {
+        return delegate?.cellSpacing?() ?? 2
     }
-    
-    private var maxCellSpacing: CGFloat {
-        return delegate?.cellSpacingRange().upperBound ?? 10
-    }
+
     
     private var minCellWidth: CGFloat {
-        return delegate?.cellWidthRange().lowerBound ?? 10
+        return delegate?.minimumCellWidth?() ?? 0
     }
     
     private var maxCellWidth: CGFloat {
-        return delegate?.cellWidthRange().upperBound ?? CGFloat.greatestFiniteMagnitude
+        return delegate?.maximumCellWidth?() ?? CGFloat.greatestFiniteMagnitude
     }
     
     override var collectionViewContentSize: CGSize {
-        return CGSize(width: contentWidth, height: contentHight)
+        return CGSize(width: contentWidth, height: contentHeight)
     }
     
     override func prepare() {
@@ -58,44 +64,55 @@ class CenteredCollectionViewLayout: UICollectionViewLayout {
             return
         }
         
-        let frameWidth = cv.frame.width - cv.contentInset.left - cv.contentInset.right
         
+        let maxWidthSum = count * maxCellWidth
+        let minWidthSum = count * minCellWidth
+        let spacingSum = (count - 1) * cellSpacing
         
-        var maxWidthSum = count * maxCellWidth
-        var minWidthSum = count * minCellWidth
-        var maxSpacingSum = (count - 1) * maxCellSpacing
-        var minSpacingSum = (count - 1) * minCellSpacing
+        let finalCellWidth: CGFloat
         
-        let finalCellWidth, finalCellSpacing: CGFloat
-        
-        if maxWidthSum + maxSpacingSum <= frameWidth {
+        if maxWidthSum + spacingSum <= viewPortWidth {
             finalCellWidth = maxCellWidth
-            finalCellSpacing = maxCellSpacing
         }
-        else if maxWidthSum <= frameWidth {
-            finalCellWidth = maxCellWidth
-            let cellSpacingNeeded = count > 1 ? (frameWidth - maxWidthSum) / (count - 1) : 0
-            finalCellSpacing = max(cellSpacingNeeded, minCellSpacing)
-        }
-        else if minWidthSum + minSpacingSum <= frameWidth {
-            finalCellSpacing = minCellSpacing
-            let remainingWidth = frameWidth - minSpacingSum * (count - 1)
+        else if minWidthSum + spacingSum <= viewPortWidth {
+            let remainingWidth = viewPortWidth - spacingSum
             finalCellWidth = remainingWidth / count
         }
         else {
-            finalCellSpacing = minCellSpacing
             finalCellWidth = minCellWidth
         }
         
-        contentWidth = count * finalCellWidth + (count - 1) * finalCellSpacing
+        contentWidth = count * finalCellWidth + (count - 1) * cellSpacing
         
-        if Int(count) % 2 == 0 {
-            
+        var left: CGFloat
+        
+        if contentWidth > viewPortWidth {
+            left = cv.contentInset.left
+        } else {
+            let midX = cv.contentInset.left + viewPortWidth / 2
+            left = midX - contentWidth / 2
+        }
+        
+        let top = cv.contentInset.top
+        
+        for i in 0..<Int(count) {
+            let attr = UICollectionViewLayoutAttributes(forCellWith: IndexPath(item: i, section: 0))
+            let frame = CGRect(x: left, y: top, width: finalCellWidth, height: contentHeight)
+            attr.frame = frame
+            cache.append(attr)
+            left += finalCellWidth + cellSpacing
         }
         
         
-        
-        
+    }
+    
+    override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+
+        return cache
+    }
+    
+    override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        return cache[indexPath.item]
     }
     
 }

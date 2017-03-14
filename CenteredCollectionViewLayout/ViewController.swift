@@ -12,15 +12,23 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
 
     @IBOutlet weak var collectionView: UICollectionView!
     
+    var number: Int = 0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         collectionView.dataSource = self
-        collectionView.contentInset = UIEdgeInsets(top: 5, left: 10, bottom: 2, right: 15)
+        let layout = CenteredCollectionViewLayout()
+        layout.delegate = self
+        collectionView.collectionViewLayout = layout
+        
+//        collectionView.contentInset = UIEdgeInsets(top: 5, left: 10, bottom: 2, right: 15)
+        
+        
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 7
+        return number
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -30,5 +38,24 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     }
 
     
+    @IBAction func stepperChanged(_ sender: UIStepper) {
+        number = Int(sender.value)
+        collectionView.reloadData()
+    }
 }
 
+
+
+extension ViewController: CenteredCollectionViewLayoutDelegate {
+    func minimumCellWidth() -> CGFloat {
+        return 30
+    }
+    
+    func maximumCellWidth() -> CGFloat {
+        return 60
+    }
+    
+    func cellSpacing() -> CGFloat {
+        return 5
+    }
+}
